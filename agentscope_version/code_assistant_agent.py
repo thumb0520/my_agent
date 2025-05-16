@@ -36,21 +36,18 @@ agentscope.init(
     },
 )
 
-# mcp_server_config = {
-#     "mcpServers": {
-#         "filesystem": {
-#             "command": "npx",
-#             "args": [
-#                 "-y",
-#                 "@modelcontextprotocol/server-filesystem",
-#                 "./"
-#             ]
-#         }
-#     }
-# }
+mcp_server_config = {
+    "mcpServers": {
+        "webSearch": {
+            "command": "python",
+            "args": [
+                "mcp_tools/mcp_server_search/main.py"
+            ]
+        }
+    }
+}
 
 executor_toolkit = ServiceToolkit()
-# executor_toolkit.add_mcp_servers(server_configs=mcp_server_config)
 executor_toolkit.add(execute_shell_command)
 executor_toolkit.add(execute_python_code)
 executor_toolkit.add(create_file)
@@ -61,7 +58,8 @@ executor_toolkit.add(read_text_file)
 executor_toolkit.add(write_text_file)
 
 search_toolkit = ServiceToolkit()
-search_toolkit.add(tavily_search, api_key=TAVILY_SEARCH_API_KEY)
+search_toolkit.add_mcp_servers(mcp_server_config)
+# search_toolkit.add(tavily_search, api_key=TAVILY_SEARCH_API_KEY)
 
 executor_agent = ReActAgent(name="executor", model_config_name="deepseek-chat",
                             service_toolkit=executor_toolkit,
@@ -75,6 +73,9 @@ search_agent = ReActAgent(
     service_toolkit=search_toolkit,
     sys_prompt=SEARCH_AGENT_PROMPT,
 )
+
+# msg = Msg("user", "什么电影好看？", "user")
+# msg = search_agent(msg)
 
 # Workflow: Routing
 routing_agent = DictDialogAgent(
