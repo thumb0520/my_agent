@@ -3,22 +3,24 @@ from agentscope.service.service_response import ServiceResponse
 from agentscope.service.service_status import ServiceExecStatus
 import requests
 import json
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+TAVILY_SEARCH_API_KEY = os.getenv("TAVILY_API_KEY")
 
 
 def tavily_search(
         question: str,
-        api_key: str,
         num_results: int = 10,
         **kwargs: Any,
-) -> ServiceResponse:
+) -> str:
     """
     Search question in tavily Search API and return the searching results
 
     Args:
         question (`str`):
             The search query string.
-        api_key (`str`):
-            The API key provided for authenticating with the tavily Search API.
         num_results (`int`, defaults to `10`):
             The number of search results to return.
         **kwargs (`Any`):
@@ -74,10 +76,12 @@ def tavily_search(
                 ]
             }
     """
+    print(f"搜索问题: {question}")
+    print(f"搜索条数: {num_results}")
 
     # tavily Search API endpoint
     url = "https://api.tavily.com/search"
-    authorization = f"Bearer {api_key}"
+    authorization = f"Bearer {TAVILY_SEARCH_API_KEY}"
     payload = {
         "query": question,
         "topic": "general",
@@ -103,14 +107,12 @@ def tavily_search(
     print(response.text)
     json_data = json.loads(response.text)
     content = [
-            {
-                "title": result["title"],
-                "link": result["url"],
-                "snippet": result["content"],
-            }
-            for result in json_data["results"]
-        ]
-    return ServiceResponse(
-        status=ServiceExecStatus.SUCCESS,
-        content=content,
-    )
+        {
+            "title": result["title"],
+            "link": result["url"],
+            "snippet": result["content"],
+        }
+        for result in json_data["results"]
+    ]
+    print(f"搜索结果：{content}")
+    return json.dumps(content, ensure_ascii=False)
