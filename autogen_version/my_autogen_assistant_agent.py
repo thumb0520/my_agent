@@ -14,6 +14,8 @@ from prompts.selector_prompt import SELECTOR_PROMPT
 from prompts.command_executor_prompt import EXECUTOR_PROMPT
 from typing import List, Sequence
 from tools.save_file_tool import save_file
+from stop_condition.stop_condition import stop
+from stop_condition.stop_condition import FunctionCallTermination
 from agentscope.service import (
     execute_shell_command,
     create_file,
@@ -76,6 +78,13 @@ async def main() -> None:
     user_proxy_agent = UserProxyAgent("UserProxyAgent",
                                       description="A proxy for the user to approve or disapprove tasks.")
 
+    stop_agent = AssistantAgent(
+        name="StopAgent",
+        description="An agent for stopping the conversation.",
+        model_client=model_client,
+        tools=[stop]
+    )
+
     # fetch_mcp_server = SseServerParams(
     #     url="http://127.0.0.1:8000/sse",
     #     timeout=30,  # Connection timeout in seconds
@@ -90,33 +99,16 @@ async def main() -> None:
     #     system_message=SEARCH_WEB_AGENT_PROMPT
     # )
 
-    def selector_func_with_user_proxy(messages: Sequence[BaseAgentEvent | BaseChatMessage]) -> str | None:
-        if messages[-1].source != planning_agent.name and messages[-1].source != user_proxy_agent.name:
-            # Planning agent should be the first to engage when given a new task, or check progress.
-            return planning_agent.name
-        if messages[-1].source == planning_agent.name:
-            if messages[-2].source == user_proxy_agent.name and "APPROVE" in messages[
-                -1].content.upper():  # type: ignore
-                # User has approved the plan, proceed to the next agent.
-                return None
-            # Use the user proxy agent to get the user's approval to proceed.
-            return user_proxy_agent.name
-        if messages[-1].source == user_proxy_agent.name:
-            # If the user does not approve, return to the planning agent.
-            if "APPROVE" not in messages[-1].content.upper():  # type: ignore
-                return planning_agent.name
-        return None
-
-    text_mention_termination = TextMentionTermination("TERMINATE")
+    # text_mention_termination = TextMentionTermination("TERMINATE")
+    function_call_termination = FunctionCallTermination(function_name="stop")
     max_messages_termination = MaxMessageTermination(max_messages=15)
-    termination = text_mention_termination | max_messages_termination
+    termination = function_call_termination | max_messages_termination
 
     team = SelectorGroupChat(
-        [planning_agent, web_search_agent, command_executor_agent, user_proxy_agent],
+        [planning_agent, web_search_agent, command_executor_agent, stop_agent],
         model_client=model_client,
         termination_condition=termination,
         selector_prompt=SELECTOR_PROMPT,
-        selector_func=selector_func_with_user_proxy,
         allow_repeated_speaker=True,  # Allow an agent to speak multiple turns in a row.
     )
 
