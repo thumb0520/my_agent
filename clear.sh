@@ -1,0 +1,1 @@
+rm -rf agentscope_version/runs

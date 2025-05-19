@@ -70,6 +70,9 @@ search_agent = ReActAgent(
     sys_prompt=SEARCH_AGENT_PROMPT,
 )
 
+# msg = Msg("user", "什么电影好看？", "user")
+# msg = search_agent(msg)
+
 # Workflow: Routing
 routing_agent = DictDialogAgent(
     name="Routing",

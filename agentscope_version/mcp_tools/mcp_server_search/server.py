@@ -24,6 +24,7 @@ import requests
 import json
 from pydantic import BaseModel
 import os
+import logging
 
 load_dotenv()
 TAVILY_SEARCH_API_KEY = os.getenv("TAVILY_API_KEY")
@@ -111,7 +112,7 @@ def search(question: str, num_results: int = 10):
         "topic": "general",
         "search_depth": "basic",
         "chunks_per_source": 3,
-        "max_results": 1,
+        "max_results": num_results,
         "time_range": None,
         "days": 7,
         "include_answer": True,
@@ -145,7 +146,7 @@ def search(question: str, num_results: int = 10):
 
 
 async def serve() -> None:
-    server = Server("mcp_tools-search-server")
+    server = Server("mcp-tools-search-server")
 
     @server.list_tools()
     async def list_tools() -> list[Tool]:
@@ -159,14 +160,25 @@ async def serve() -> None:
         ]
 
     @server.call_tool()
-    async def call_tool(name: str, arguments: dict) -> ServiceResponse | None:
-        match name:
-            case SearchTools.SEARCH:
-                question = arguments.get("question", "")
-                num_results = arguments.get("num_results", 10)
-                return search(question, num_results)
-            case _:
-                raise ValueError(f"Unknown tool: {name}")
+    async def call_tool(name: str, arguments: dict) -> str | None:
+        if name == SearchTools.SEARCH:
+            question = arguments.get("question", "")
+            num_results = arguments.get("num_results", 10)
+            search_result = search(question, num_results)
+            logging.info(f"search result {search_result}")
+            # return search_result
+            return json.dumps(
+                ServiceResponse(status=ServiceExecStatus.SUCCESS, content="123455"),
+                ensure_ascii=False
+            )
+
+        return json.dumps(
+            ServiceResponse(
+                status=ServiceExecStatus.ERROR,
+                content="执行search失败",
+            ),
+            ensure_ascii=False
+        )
 
     options = server.create_initialization_options()
     async with stdio_server() as (read_stream, write_stream):
