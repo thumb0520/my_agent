@@ -1,6 +1,5 @@
 from typing import Any
 from agentscope.service.service_response import ServiceResponse
-from agentscope.service.service_status import ServiceExecStatus
 import requests
 import json
 from dotenv import load_dotenv
