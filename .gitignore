@@ -10,7 +10,9 @@ __pycache__/
 .Python
 .idea/
 agentscope_version/runs/
+agentscope_version/example/
 agentscope_version/prompts/runs/
+autogen_version/example/
 build/
 develop-eggs/
 dist/
