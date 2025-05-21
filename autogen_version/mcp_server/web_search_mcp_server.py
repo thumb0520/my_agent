@@ -1,17 +1,17 @@
-import anyio
-import click
 import mcp.types as types
-from mcp.server import Server
 from pydantic import Field
 import os
 from dotenv import load_dotenv
 import json
 import httpx
+from fastmcp import FastMCP
 
 load_dotenv()
 TAVILY_SEARCH_API_KEY = os.getenv("TAVILY_API_KEY")
 
+mcp = FastMCP("tavily search server")
 
+@mcp.tool()
 async def fetch_website(
         question: str = Field(description="The search query string."),
         num_results: int = Field(description="The number of search results to return.")
@@ -103,90 +103,5 @@ async def fetch_website(
         return [types.TextContent(type="text", text=json.dumps(content, ensure_ascii=False))]
 
 
-@click.command()
-@click.option("--port", default=8000, help="Port to listen on for SSE")
-@click.option(
-    "--transport",
-    type=click.Choice(["stdio", "sse"]),
-    default="stdio",
-    help="Transport type",
-)
-def main(port: int, transport: str) -> int:
-    app = Server("mcp-website-fetcher")
-
-    @app.call_tool()
-    async def fetch_tool(
-            name: str, arguments: dict
-    ) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
-        if name != "fetch":
-            raise ValueError(f"Unknown tool: {name}")
-        if "question" not in arguments or "num_results" not in arguments:
-            raise ValueError("Missing required argument")
-        return await fetch_website(arguments["question"], arguments["num_results"])
-
-    @app.list_tools()
-    async def list_tools() -> list[types.Tool]:
-        return [
-            types.Tool(
-                name="fetch",
-                description="Fetches a website and returns its content",
-                inputSchema={
-                    "type": "object",
-                    "required": ["url"],
-                    "properties": {
-                        "question": {
-                            "type": "string",
-                            "description": "The search query string.",
-                        },
-                        "num_results": {
-                            "type": "integer",
-                            "description": "The number of results to return.",
-                        }
-                    },
-                },
-            )
-        ]
-
-    if transport == "sse":
-        from mcp.server.sse import SseServerTransport
-        from starlette.applications import Starlette
-        from starlette.routing import Mount, Route
-
-        sse = SseServerTransport("/messages/")
-
-        async def handle_sse(request):
-            async with sse.connect_sse(
-                    request.scope, request.receive, request._send
-            ) as streams:
-                await app.run(
-                    streams[0], streams[1], app.create_initialization_options()
-                )
-                return None  # Explicitly return None to indicate successful completion
-
-        starlette_app = Starlette(
-            debug=True,
-            routes=[
-                Route("/sse", endpoint=handle_sse),
-                Mount("/messages/", app=sse.handle_post_message),
-            ],
-        )
-
-        import uvicorn
-
-        uvicorn.run(starlette_app, host="127.0.0.1", port=port)
-    else:
-        from mcp.server.stdio import stdio_server
-
-        async def arun():
-            async with stdio_server() as streams:
-                await app.run(
-                    streams[0], streams[1], app.create_initialization_options()
-                )
-
-        anyio.run(arun)
-
-    return 0
-
-
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    mcp.run(transport="sse")

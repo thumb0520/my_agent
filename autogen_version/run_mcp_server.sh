@@ -1,1 +1,1 @@
-python mcp_server/main.py --transport sse --port 8000
+python mcp_server/web_search_mcp_server.py
