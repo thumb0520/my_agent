@@ -115,6 +115,7 @@ python my_assistant_agent.py
 
 ## TODO 
 - autogen适配deepseek 结构化输出api
+- autogen version 接入mcp server ☑️
 ## 许可证
 
 [添加许可证信息]
