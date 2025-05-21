@@ -114,6 +114,8 @@ python my_assistant_agent.py
 2. 建议在虚拟环境中运行项目
 3. 使用前请确保所有依赖已正确安装
 
+## TODO 
+- autogen适配deepseek 结构化输出api
 ## 许可证
 
 [添加许可证信息]
