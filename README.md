@@ -14,7 +14,6 @@
 ├── agentscope_version/      # AgentScope 框架实现版本
 │   ├── tools/               # 自定义工具
 │   ├── prompts/             # 提示词模板
-│   ├── runs/                # 运行记录
 │   └── example/             # 示例代码
 ├── requirements.txt         # 项目依赖
 ├── .env.example            # 环境变量示例
