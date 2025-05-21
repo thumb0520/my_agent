@@ -1,12 +1,6 @@
 import asyncio
 from autogen_core.models import ModelFamily
-from autogen_agentchat.agents import AssistantAgent
-from autogen_agentchat.ui import Console
-from autogen_ext.models.openai import OpenAIChatCompletionClient
-from autogen_core.memory import ListMemory, MemoryContent, MemoryMimeType
-from autogen_agentchat.messages import MultiModalMessage, BaseChatMessage, BaseAgentEvent
-from autogen_ext.tools.code_execution import PythonCodeExecutionTool
-from autogen_ext.tools.mcp import StdioServerParams, SseServerParams, SseMcpToolAdapter
+from autogen_ext.tools.mcp import SseMcpToolAdapter, SseServerParams, mcp_server_tools
 from tools.my_search_tool import tavily_search
 from prompts.search_web_agent_prompt import SEARCH_WEB_AGENT_PROMPT
 from prompts.planning_agent_prompt import PLANNING_AGENT_PROMPT
@@ -16,22 +10,13 @@ from typing import List, Sequence
 from tools.save_file_tool import save_file
 from stop_condition.stop_condition import stop
 from stop_condition.stop_condition import FunctionCallTermination
-from agentscope.service import (
-    execute_shell_command,
-    create_file,
-    create_directory,
-    list_directory_content,
-    get_current_directory,
-    read_text_file,
-    write_text_file,
-)
 from autogen_agentchat.agents import AssistantAgent, UserProxyAgent
 from autogen_agentchat.conditions import MaxMessageTermination, TextMentionTermination
 from autogen_agentchat.teams import SelectorGroupChat
 from autogen_agentchat.ui import Console
-from autogen_ext.models.openai import OpenAIChatCompletionClient
 from dotenv import load_dotenv
 import os
+from autogen_ext.models.openai import OpenAIChatCompletionClient
 
 load_dotenv()
 DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
@@ -47,7 +32,8 @@ async def main() -> None:
             "vision": False,
             "function_calling": True,
             "json_output": True,
-            "family": ModelFamily.UNKNOWN
+            "family": ModelFamily.R1,
+            "structured_output": True,
         },
     )
 
@@ -67,14 +53,6 @@ async def main() -> None:
         system_message=EXECUTOR_PROMPT,
     )
 
-    web_search_agent = AssistantAgent(
-        "WebSearchAgent",
-        description="An agent for searching information on the web.",
-        tools=[tavily_search],
-        model_client=model_client,
-        system_message=SEARCH_WEB_AGENT_PROMPT,
-    )
-
     user_proxy_agent = UserProxyAgent("UserProxyAgent",
                                       description="A proxy for the user to approve or disapprove tasks.")
 
@@ -85,21 +63,20 @@ async def main() -> None:
         tools=[stop]
     )
 
-    # fetch_mcp_server = SseServerParams(
-    #     url="http://127.0.0.1:8000/sse",
-    #     timeout=30,  # Connection timeout in seconds
-    # )
-    # # Get the translation tool from the server
-    # adapter = await SseMcpToolAdapter.from_server_params(fetch_mcp_server, "translate")
-    # web_search_agent = AssistantAgent(
-    #     name="WebSearchAgent",
-    #     description="An agent for searching information on the web.",
-    #     model_client=model_client,
-    #     tools=[adapter],
-    #     system_message=SEARCH_WEB_AGENT_PROMPT
-    # )
+    fetch_mcp_server = SseServerParams(
+        url="http://127.0.0.1:8000/sse",
+        headers={"content-type": "text/event-stream; charset=utf-8"}
+    )
+    tools = await mcp_server_tools(fetch_mcp_server)
+    web_search_agent = AssistantAgent(
+        name="WebSearchAgent",
+        description="An agent for searching information on the web.",
+        model_client=model_client,
+        tools=tools,
+        reflect_on_tool_use=True,
+        system_message=SEARCH_WEB_AGENT_PROMPT
+    )
 
-    # text_mention_termination = TextMentionTermination("TERMINATE")
     function_call_termination = FunctionCallTermination(function_name="stop")
     max_messages_termination = MaxMessageTermination(max_messages=15)
     termination = function_call_termination | max_messages_termination

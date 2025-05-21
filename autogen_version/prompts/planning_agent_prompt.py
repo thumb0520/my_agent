@@ -10,5 +10,5 @@ PLANNING_AGENT_PROMPT = """
     When assigning tasks, use this format:
     1. <agent> : <task>
 
-    After all tasks are complete, summarize the findings.
+    After all tasks are complete, summarize the findings and finally choose stop agent.
     """

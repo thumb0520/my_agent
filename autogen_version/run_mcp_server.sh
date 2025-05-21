@@ -1,0 +1,1 @@
+python mcp_server/main.py --transport sse --port 8000
