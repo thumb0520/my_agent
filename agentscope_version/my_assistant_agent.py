@@ -8,7 +8,6 @@ from prompts.search_agent_prompt import SEARCH_AGENT_PROMPT
 from prompts.execute_command_prompt import EXECUTOR_PROMPT
 from agentscope.agents import ReActAgentV2, UserAgent, DialogAgent, DictDialogAgent, ReActAgent
 from agentscope.parsers import MarkdownJsonDictParser
-from tools.my_search_tool import tavily_search
 from agentscope.service import (ServiceToolkit,
                                 execute_python_code,
                                 execute_shell_command,
@@ -112,3 +111,7 @@ with msghub(participants=[routing_agent, user_agent, search_agent, executor_agen
         if msg.metadata == "Finish":
             logger.info("decide to finish task")
             break
+
+logger.info("routing_agent的记忆：")
+for msg in routing_agent.memory.get_memory():
+    logger.info(f"{msg.name}：{msg.content}")
