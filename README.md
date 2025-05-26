@@ -115,6 +115,7 @@ python my_assistant_agent.py
 
 ## TODO 
 - autogen适配deepseek 结构化输出api☑️
+- autogen deepseek 结构话输出接口自动添加实体类型描述至system prompt
 - autogen写一个复杂图结构的agent应用
 - autogen version 接入mcp server ☑️
 ## 许可证
