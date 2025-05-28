@@ -11,6 +11,7 @@ trace_logger = logging.getLogger(TRACE_LOGGER_NAME)
 _MODEL_POINTERS = {
     # deepseek models
     "deepseek-chat": "deepseek-chat",
+    "deepseek-reasoner": "deepseek-reasoner",
 }
 
 _MODEL_INFO: Dict[str, ModelInfo] = {
