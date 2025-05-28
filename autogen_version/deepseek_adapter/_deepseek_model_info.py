@@ -22,7 +22,7 @@ _MODEL_INFO: Dict[str, ModelInfo] = {
         "structured_output": True,
         "multiple_system_messages": False,
     },
-    "deepseek-reasoner":{
+    "deepseek-reasoner": {
         "vision": False,
         "function_calling": False,
         "json_output": False,
@@ -34,6 +34,7 @@ _MODEL_INFO: Dict[str, ModelInfo] = {
 
 _MODEL_TOKEN_LIMITS: Dict[str, int] = {
     "deepseek-chat": 200000,
+    "deepseek-reasoner": 200000,
 }
 
 DEEPSEEK_OPENAI_BASE_URL = "https://api.deepseek.com/v1"
