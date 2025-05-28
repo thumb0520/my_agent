@@ -385,23 +385,22 @@ class MyDeepSeekClient(ChatCompletionClient, Component[OpenAIClientConfiguration
 
         # Special handling for Gemini model.
         assert "model" in copied_args and isinstance(copied_args["model"], str)
-        if copied_args["model"].startswith("gemini-"):
+        if copied_args["model"].startswith("deepseek"):
             if "base_url" not in copied_args:
-                copied_args["base_url"] = _deepseek_model_info.GEMINI_OPENAI_BASE_URL
-            if "api_key" not in copied_args and "GEMINI_API_KEY" in os.environ:
-                copied_args["api_key"] = os.environ["GEMINI_API_KEY"]
-        if copied_args["model"].startswith("claude-"):
-            if "base_url" not in copied_args:
-                copied_args["base_url"] = _deepseek_model_info.ANTHROPIC_OPENAI_BASE_URL
-            if "api_key" not in copied_args and "ANTHROPIC_API_KEY" in os.environ:
-                copied_args["api_key"] = os.environ["ANTHROPIC_API_KEY"]
-
+                copied_args["base_url"] = _deepseek_model_info.DEEPSEEK_OPENAI_BASE_URL
+            if "api_key" not in copied_args and "DEEPSEEK_API_KEY" in os.environ:
+                copied_args["api_key"] = os.environ["DEEPSEEK_API_KEY"]
         client = _openai_client_from_config(copied_args)
         create_args = _create_args_from_config(copied_args)
 
         self._client = client
         self._add_name_prefixes = add_name_prefixes
-        self._model_info = model_info
+
+        if  model_info is None:
+            try:
+                self._model_info = _deepseek_model_info.get_info(create_args["model"])
+            except KeyError as err:
+                raise ValueError("model_info is required when model name is not a valid OpenAI model") from err
         # Validate model_info, check if all required fields are present
         validate_model_info(self._model_info)
 
