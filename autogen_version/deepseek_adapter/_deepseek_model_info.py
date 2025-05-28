@@ -18,7 +18,7 @@ _MODEL_INFO: Dict[str, ModelInfo] = {
         "vision": False,
         "function_calling": True,
         "json_output": True,
-        "family": ModelFamily.R1,
+        "family": "deepseek-chat",
         "structured_output": True,
         "multiple_system_messages": False,
     },

@@ -1,6 +1,7 @@
 import asyncio
 from autogen_core.models import ModelFamily
 from autogen_ext.tools.mcp import SseMcpToolAdapter, SseServerParams, mcp_server_tools
+from autogen_version.deepseek_adapter import MyDeepSeekClient
 from tools.my_search_tool import tavily_search
 from prompts.search_web_agent_prompt import SEARCH_WEB_AGENT_PROMPT
 from prompts.planning_agent_prompt import PLANNING_AGENT_PROMPT
@@ -24,18 +25,20 @@ DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
 
 async def main() -> None:
     # Create the agents.
-    model_client = OpenAIChatCompletionClient(
-        model="deepseek-chat",
-        api_key=DEEPSEEK_API_KEY,
-        base_url="https://api.deepseek.com/v1",
-        model_info={
-            "vision": False,
-            "function_calling": True,
-            "json_output": True,
-            "family": ModelFamily.R1,
-            "structured_output": True,
-        },
-    )
+    # model_client = OpenAIChatCompletionClient(
+    #     model="deepseek-chat",
+    #     api_key=DEEPSEEK_API_KEY,
+    #     base_url="https://api.deepseek.com/v1",
+    #     model_info={
+    #         "vision": False,
+    #         "function_calling": True,
+    #         "json_output": True,
+    #         "family": ModelFamily.UNKNOWN,
+    #         "structured_output": True,
+    #     },
+    # )
+
+    model_client = MyDeepSeekClient(model="deepseek-chat", api_key=DEEPSEEK_API_KEY)
 
     planning_agent = AssistantAgent(
         "PlanningAgent",
