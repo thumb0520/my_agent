@@ -42,13 +42,13 @@ async def getClient():
 
 @mcp.tool
 async def add_download_url(
-        download_urls: List[str] = Field(description="the qb download url list")
+        url: List[str] = Field(description="the qb download url list")
 ) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """
            add download url to qbittorrent download list
 
            Args:
-               download_urls (`List[str]`):
+               url (`List[str]`):
                    The download url list
            Returns:
                ``Ok.`` for success and ``Fails.`` for failure.
@@ -66,9 +66,9 @@ async def add_download_url(
 
                     "OK."
     """
-    logger.info(f"Adding download URLs: {download_urls}")
+    logger.info(f"Adding download URLs: {url}")
     client = await getClient()
-    result = client.torrents_add(download_urls)
+    result = client.torrents_add(url)
     logger.info(f"Successfully added torrents: {result}")
     return [types.TextContent(type="text", text=result)]
 
