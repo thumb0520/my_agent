@@ -28,6 +28,7 @@
 ## 安装步骤
 
 1. 克隆项目：
+
 ```bash
 git clone [repository-url]
 cd my_agent
@@ -36,6 +37,7 @@ cd my_agent
 2. 创建并激活虚拟环境（推荐）：
 
 使用 Conda：
+
 ```bash
 # 创建新的 conda 环境
 conda create -n my_agent python=3.10
@@ -45,15 +47,19 @@ conda activate my_agent
 ```
 
 3. 安装依赖：
+
 ```bash
 pip install -r requirements.txt
 ```
 
 4. 配置环境变量：
+
 ```bash
 cp .env.example .env
 ```
+
 然后编辑 `.env` 文件，填入必要的 API 密钥：
+
 - DEEPSEEK_API_KEY：DeepSeek API 密钥
 - TAVILY_API_KEY：Tavily 搜索 API 密钥
 
@@ -62,17 +68,19 @@ cp .env.example .env
 项目提供了两个版本的实现：
 
 1. AutoGen 版本 (`autogen_version/`)
-   - 基于 AutoGen 框架的智能代理实现
-   - 包含自定义工具和提示词模板
-   - 支持多种停止条件
+    - 基于 AutoGen 框架的智能代理实现
+    - 包含自定义工具和提示词模板
+    - 支持多种停止条件
 
 2. AgentScope 版本 (`agentscope_version/`)
-   - 基于 AgentScope 框架的智能代理实现
-   - 包含自定义工具和提示词模板
-   - 支持运行记录和示例代码
+    - 基于 AgentScope 框架的智能代理实现
+    - 包含自定义工具和提示词模板
+    - 支持运行记录和示例代码
 
 ## 使用说明
+
 ### 启动mcp sse server
+
 ```bash
 cd agentscope_version/mcp_tools
 mcp run main.py -t sse
@@ -92,9 +100,21 @@ cd agentscope_version
 python my_assistant_agent.py
 ```
 
+## MCP服务能力说明
+
+### qbittorrent_mcp_server
+
+- 提供从rarbg搜索磁力链接🧲
+- 添加磁力链接🧲到qbittorrent下载列表
+
+### web_search_mcp_server:
+
+- 联网搜索
+
 ## 依赖说明
 
 主要依赖包括：
+
 - agentscope==0.1.4
 - autogen-agentchat==0.4.9.3
 - autogen-core==0.4.9.3
@@ -113,11 +133,13 @@ python my_assistant_agent.py
 2. 建议在虚拟环境中运行项目
 3. 使用前请确保所有依赖已正确安装
 
-## TODO 
+## TODO
+
 - autogen适配deepseek 结构化输出api☑️
 - autogen deepseek 结构化输出接口自动添加实体类型描述至system prompt
 - autogen写一个复杂图结构的agent应用
 - autogen version 接入mcp server ☑️
+
 ## 许可证
 
 [添加许可证信息]
