@@ -67,7 +67,7 @@ async def main() -> None:
     )
 
     fetch_mcp_server = SseServerParams(
-        url="http://127.0.0.1:8000/sse",
+        url="http://127.0.0.1:8080/sse",
         headers={"content-type": "text/event-stream; charset=utf-8"}
     )
     tools = await mcp_server_tools(fetch_mcp_server)

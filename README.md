@@ -49,7 +49,7 @@ conda activate my_agent
 3. 安装依赖：
 
 ```bash
-pip install -r requirements.txt
+pip install -r autogen_version/requirements.txt
 ```
 
 4. 配置环境变量：

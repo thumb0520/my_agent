@@ -1,7 +1,6 @@
 import json
-
+import logging
 import mcp.types as types
-from fastmcp.contrib.mcp_mixin import mcp_tool
 from pydantic import Field
 import os
 from dotenv import load_dotenv
@@ -9,6 +8,15 @@ from typing import List
 from fastmcp import FastMCP
 from qbittorrentapi import Client
 from autogen_version.rarbg import rarbgcli
+from autogen_version.config.mcp_server_config import QBITTORRENT_MCP_SERVER_CONFIG
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 mcp = FastMCP("qbittorrent_mcp_server")
@@ -20,6 +28,7 @@ qb_password = os.getenv("QBITTORRENTAPI_PASSWORD")
 
 
 async def getClient():
+    logger.info("Initializing qBittorrent client")
     # 创建Client对象
     client = Client(
         host=qb_host,  # qBittorrent的地址，可以是IP或主机名
@@ -27,10 +36,11 @@ async def getClient():
         username=qb_user,  # 你的用户名，如果没有设置则可以省略或使用None
         password=qb_password  # 你的密码，如果没有设置则可以省略或使用None
     )
+    logger.debug(f"Client initialized with host: {qb_host}, port: {qb_port}")
     return client
 
 
-@mcp.tool()
+@mcp.tool
 async def add_download_url(
         download_urls: List[str] = Field(description="the qb download url list")
 ) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
@@ -56,12 +66,14 @@ async def add_download_url(
 
                     "OK."
     """
-    client = getClient()
+    logger.info(f"Adding download URLs: {download_urls}")
+    client = await getClient()
     result = client.torrents_add(download_urls)
+    logger.info(f"Successfully added torrents: {result}")
     return [types.TextContent(type="text", text=result)]
 
 
-@mcp_tool()
+@mcp.tool
 async def get_download_url(
         query: str = Field(description="The search query movie name ")
 ) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
@@ -94,6 +106,7 @@ async def get_download_url(
                         }
                     ]
     """
+    logger.info(f"Searching for movie: {query}")
     args = [
         query,
         "--magnet",
@@ -102,8 +115,15 @@ async def get_download_url(
         "--limit", "1"
     ]
     result = rarbgcli.cli(args)
-    return [types.TextContent(type="text", text=json.dumps([{"magnet_url": t} for t in result], ensure_ascii=False))]
+    logger.info(f"Found {len(result)} results for query: {query}")
+    return [
+        types.TextContent(
+            type="text", text=json.dumps([{"magnet_url": t} for t in result], ensure_ascii=False)
+        )
+    ]
 
 
 if __name__ == "__main__":
-    mcp.run(transport="sse")
+    logger.info("Starting qBittorrent MCP server")
+    transport, port = QBITTORRENT_MCP_SERVER_CONFIG["transport"], QBITTORRENT_MCP_SERVER_CONFIG["port"]
+    mcp.run(transport=transport, port=port)

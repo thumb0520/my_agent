@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import json
 import httpx
 from fastmcp import FastMCP
+from autogen_version.config.mcp_server_config import WEB_SEARCH_MCP_SERVER_CONFIG
 
 load_dotenv()
 TAVILY_SEARCH_API_KEY = os.getenv("TAVILY_API_KEY")
@@ -104,4 +105,5 @@ async def fetch_website(
 
 
 if __name__ == "__main__":
-    mcp.run(transport="sse")
+    transport, port = WEB_SEARCH_MCP_SERVER_CONFIG["transport"], WEB_SEARCH_MCP_SERVER_CONFIG["port"]
+    mcp.run(transport=transport, port=port)
