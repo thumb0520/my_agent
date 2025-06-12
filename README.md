@@ -5,19 +5,26 @@
 ## 项目结构
 
 ```
-.
-├── autogen_version/          # AutoGen 框架实现版本
-│   ├── tools/               # 自定义工具
-│   ├── prompts/             # 提示词模板
-│   ├── stop_condition/      # 停止条件
-│   └── example/             # 示例代码
-├── agentscope_version/      # AgentScope 框架实现版本
-│   ├── tools/               # 自定义工具
-│   ├── prompts/             # 提示词模板
-│   └── example/             # 示例代码
-├── requirements.txt         # 项目依赖
-├── .env.example            # 环境变量示例
-└── clear.sh                # 清理脚本
+my_agent
+├─ agentscope_version 
+│  ├─ my_assistant_agent.py 主应用入口
+│  ├─ prompts agent提示词
+│  └─ tools 内置工具
+├─ autogen_version
+│  ├─ agents 主应用入口
+│  │  └─ qbittorrent_agent.py 
+│  ├─ config 项目配置
+│  ├─ deepseek_adapter DS接口适配
+│  ├─ prompts agent提示词
+│  ├─ tools 内置工具
+│  ├─ stop_condition 自定义停止条件
+│  └─ requirements.txt 依赖
+└─ mcp_server
+   ├─ config mcp server启动配置
+   ├─ qbittorrent bt下载相关mcp server
+   ├─ rarbg rarbg搜索核心
+   ├─ web_search 网络搜索mcp server
+   └─ requirements.txt 依赖
 ```
 
 ## 环境要求
@@ -30,7 +37,7 @@
 1. 克隆项目：
 
 ```bash
-git clone [repository-url]
+git clone https://github.com/yourusername/my_agent.git
 cd my_agent
 ```
 
@@ -71,6 +78,7 @@ cp .env.example .env
     - 基于 AutoGen 框架的智能代理实现
     - 包含自定义工具和提示词模板
     - 支持多种停止条件
+    - 已集成 MCP 服务
 
 2. AgentScope 版本 (`agentscope_version/`)
     - 基于 AgentScope 框架的智能代理实现
@@ -79,7 +87,7 @@ cp .env.example .env
 
 ## 使用说明
 
-### 启动mcp sse server
+### 启动 MCP SSE Server
 
 ```bash
 cd agentscope_version/mcp_tools
@@ -100,16 +108,21 @@ cd agentscope_version
 python my_assistant_agent.py
 ```
 
-## MCP服务能力说明
+## MCP 服务能力说明
 
 ### qbittorrent_mcp_server
 
-- 提供从rarbg搜索磁力链接🧲
-- 添加磁力链接🧲到qbittorrent下载列表
+- 提供从 rarbg 搜索磁力链接 🧲
+- 添加磁力链接 🧲 到 qbittorrent 下载列表
+- 支持下载进度监控
+- 支持下载任务管理
 
-### web_search_mcp_server:
+### web_search_mcp_server
 
-- 联网搜索
+- 联网搜索功能
+- 支持多搜索引擎集成
+- 提供搜索结果摘要
+- 支持实时网络信息获取
 
 ## 依赖说明
 
@@ -132,18 +145,26 @@ python my_assistant_agent.py
 1. 确保已正确配置所有必要的 API 密钥
 2. 建议在虚拟环境中运行项目
 3. 使用前请确保所有依赖已正确安装
+4. MCP 服务需要单独启动才能使用相关功能
 
 ## TODO
 
-- autogen适配deepseek 结构化输出api☑️
-- autogen deepseek 结构化输出接口自动添加实体类型描述至system prompt
-- autogen写一个复杂图结构的agent应用
-- autogen version 接入mcp server ☑️
+- [x] autogen 适配 deepseek 结构化输出 api
+- [ ] autogen deepseek 结构化输出接口自动添加实体类型描述至 system prompt
+- [ ] autogen 写一个复杂图结构的 agent 应用
+- [x] autogen version 接入 mcp server
 
 ## 许可证
 
-[添加许可证信息]
+本项目采用 MIT 许可证。详见 [LICENSE](LICENSE) 文件。
 
 ## 贡献指南
 
-[添加贡献指南]
+欢迎提交 Pull Request 或创建 Issue 来改进项目。在提交代码前，请确保：
+
+1. 代码符合项目的编码规范
+2. 添加必要的测试用例
+3. 更新相关文档
+4. 提交信息清晰明了
+
+对于重大更改，请先开 Issue 讨论您想要更改的内容。
