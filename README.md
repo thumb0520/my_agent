@@ -114,17 +114,21 @@ python my_assistant_agent.py
 
 ### qbittorrent_mcp_server
 
-- 提供从 rarbg 搜索磁力链接 🧲
-- 添加磁力链接 🧲 到 qbittorrent 下载列表
-- 支持下载进度监控
-- 支持下载任务管理
+- [x] 添加磁力链接 🧲 到 qbittorrent 下载列表
+- [ ] 查询下载列表
+- [ ] 删除没有速度的种子
+
+### magnet_search_mcp_server
+
+- [x] 从 rarbg 搜索磁力链接 🧲
+- [x] 自动选择文件大小最大的种子
 
 ### web_search_mcp_server
 
-- 联网搜索功能
-- 支持多搜索引擎集成
-- 提供搜索结果摘要
-- 支持实时网络信息获取
+- [x] 联网搜索功能
+- [x] 支持多搜索引擎集成
+- [x] 提供搜索结果摘要
+- [x] 支持实时网络信息获取
 
 ## 依赖说明
 
