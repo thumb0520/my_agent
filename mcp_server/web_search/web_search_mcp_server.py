@@ -1,20 +1,23 @@
-from mcp.server import FastMCP
+import mcp.types as types
 from pydantic import Field
-from dotenv import load_dotenv
-import requests
-import json
-from agentscope.service.service_response import ServiceResponse
-from agentscope.service.service_status import ServiceExecStatus
 import os
+from dotenv import load_dotenv
+import json
+import httpx
+from fastmcp import FastMCP
+from ..config.mcp_server_config import WEB_SEARCH_MCP_SERVER_CONFIG
 
 load_dotenv()
 TAVILY_SEARCH_API_KEY = os.getenv("TAVILY_API_KEY")
 
-mcp = FastMCP()
+mcp = FastMCP("tavily search server")
+
 
 @mcp.tool()
-def search(question: str = Field(description="The search query string."),
-           num_results: int = Field(description="The number of search results to return.")) -> str:
+async def fetch_website(
+        question: str = Field(description="The search query string."),
+        num_results: int = Field(description="The number of search results to return.")
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """
            Search question in tavily Search API and return the searching results
 
@@ -24,7 +27,6 @@ def search(question: str = Field(description="The search query string."),
                num_results (`int`, defaults to `10`):
                    The number of search results to return.
            Returns:
-               `ServiceResponse`: A dictionary with two variables: `status` and
                `content`. The `status` variable is from the ServiceExecStatus enum,
                and `content` is a list of search results or error information,
                which depends on the `status` variable.
@@ -42,9 +44,7 @@ def search(question: str = Field(description="The search query string."),
 
                .. code-block:: python
 
-                   {
-                       'status': <ServiceExecStatus.SUCCESS: 1>,
-                       'content': [
+                    [
                            {
                                'title': 'What Is an Agent? Definition, Types of
                                    Agents, and Examples - Investopedia',
@@ -66,11 +66,8 @@ def search(question: str = Field(description="The search query string."),
                                    substance, or organism that exerts some force or
                                    effect: a chemical agent.'
                            }
-                       ]
-                   }
+                    ]
            """
-
-    # tavily Search API endpoint
     url = "https://api.tavily.com/search"
     authorization = f"Bearer {TAVILY_SEARCH_API_KEY}"
     payload = {
@@ -93,22 +90,21 @@ def search(question: str = Field(description="The search query string."),
         "Content-Type": "application/json"
     }
 
-    response = requests.request("POST", url, json=payload, headers=headers)
+    async with httpx.AsyncClient(follow_redirects=True, headers=headers) as client:
+        response = await client.post(url, json=payload)
+        response.raise_for_status()
+        json_data = json.loads(response.text)
+        content = [
+            {
+                "title": result["title"],
+                "link": result["url"],
+                "snippet": result["content"],
+            }
+            for result in json_data["results"]
+        ]
+        return [types.TextContent(type="text", text=json.dumps(content, ensure_ascii=False))]
 
-    print(response.text)
-    json_data = json.loads(response.text)
-    content = [
-        {
-            "title": result["title"],
-            "link": result["url"],
-            "snippet": result["content"],
-        }
-        for result in json_data["results"]
-    ]
-    return json.dumps(
-        ServiceResponse(
-            status=ServiceExecStatus.SUCCESS,
-            content=content,
-        ),
-        ensure_ascii=False
-    )
+
+if __name__ == "__main__":
+    transport, port = WEB_SEARCH_MCP_SERVER_CONFIG["transport"], WEB_SEARCH_MCP_SERVER_CONFIG["port"]
+    mcp.run(transport=transport, port=port)
