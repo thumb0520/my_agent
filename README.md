@@ -5,26 +5,28 @@
 ## 项目结构
 
 ```
-my_agent
-├─ agentscope_version 
-│  ├─ my_assistant_agent.py 主应用入口
-│  ├─ prompts agent提示词
-│  └─ tools 内置工具
-├─ autogen_version
-│  ├─ agents 主应用入口
-│  │  └─ qbittorrent_agent.py 
-│  ├─ config 项目配置
-│  ├─ deepseek_adapter DS接口适配
-│  ├─ prompts agent提示词
-│  ├─ tools 内置工具
-│  ├─ stop_condition 自定义停止条件
-│  └─ requirements.txt 依赖
-└─ mcp_server
-   ├─ config mcp server启动配置
-   ├─ qbittorrent bt下载相关mcp server
-   ├─ rarbg rarbg搜索核心
-   ├─ web_search 网络搜索mcp server
-   └─ requirements.txt 依赖
+my_agent/
+├── agentscope_version/           # AgentScope 框架实现
+│   ├── my_assistant_agent.py    # 主应用入口
+│   ├── prompts/                 # agent 提示词
+│   └── tools/                   # 内置工具
+│
+├── autogen_version/             # AutoGen 框架实现
+│   ├── agents/                  # 主应用入口
+│   │   └── qbittorrent_agent.py
+│   ├── config/                  # 项目配置
+│   ├── deepseek_adapter/        # DS 接口适配
+│   ├── prompts/                 # agent 提示词
+│   ├── tools/                   # 内置工具
+│   ├── stop_condition/          # 自定义停止条件
+│   └── requirements.txt         # 依赖
+│
+└── mcp_server/                  # MCP 服务实现
+    ├── config/                  # mcp server 启动配置
+    ├── qbittorrent/             # bt 下载相关 mcp server
+    ├── rarbg/                   # rarbg 搜索核心
+    ├── web_search/             # 网络搜索 mcp server
+    └── requirements.txt         # 依赖
 ```
 
 ## 环境要求
