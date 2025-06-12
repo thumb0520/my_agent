@@ -39,7 +39,7 @@ my_agent/
 1. 克隆项目：
 
 ```bash
-git clone https://github.com/yourusername/my_agent.git
+git clone git@github.com:thumb0520/my_agent.git
 cd my_agent
 ```
 
@@ -49,15 +49,16 @@ cd my_agent
 
 ```bash
 # 创建新的 conda 环境
-conda create -n my_agent python=3.10
+conda create -n autogen python=3.12
 
 # 激活环境
-conda activate my_agent
+conda activate autogen
 ```
 
 3. 安装依赖：
 
 ```bash
+cd autogen_verssion
 pip install -r requirements.txt
 ```
 
@@ -134,17 +135,24 @@ python my_assistant_agent.py
 
 主要依赖包括：
 
-- agentscope==0.1.4
-- autogen-agentchat==0.4.9.3
-- autogen-core==0.4.9.3
-- autogen-ext==0.4.9.3
-- autogenstudio==0.4.2.1
-- fastapi==0.115.12
-- flask==3.0.0
-- openai==1.78.1
-- pydantic==2.11.4
+### AutoGen 版本依赖
+- autogen-agentchat==0.6.1
+- autogen-core==0.6.1
+- autogen-ext==0.6.1
+- openai==1.86.0
+- pydantic==2.11.5
+- fastmcp==2.8.0
+- mcp==1.9.3
 
-完整依赖列表请参考 `requirements.txt`。
+### MCP 服务依赖
+- fastmcp==2.8.0
+- mcp==1.9.3
+- qbittorrent-api==2025.5.0
+- beautifulsoup4==4.13.4
+- requests==2.32.4
+- wget==3.2
+
+完整依赖列表请参考各目录下的 `requirements.txt` 文件。
 
 ## 注意事项
 
