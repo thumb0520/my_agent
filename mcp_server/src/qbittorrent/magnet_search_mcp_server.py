@@ -7,15 +7,12 @@ from fastmcp import FastMCP
 from rarbg import rarbgcli
 from config.mcp_server_config import MAGNET_SEARCH_MCP_SERVER_CONFIG
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 logger = logging.getLogger(__name__)
-
-load_dotenv()
 mcp = FastMCP("magnet_search_mcp_server")
 
 
@@ -66,8 +63,17 @@ def get_download_url(
     ]
 
 
+class MagnetSearchMcpServer:
+    def __init__(self):
+        load_dotenv()
+        self.mcp = mcp
+
+    def run(self):
+        logger.info("Starting magnet search MCP server")
+        run_config = MAGNET_SEARCH_MCP_SERVER_CONFIG
+        transport, port = run_config["transport"], run_config["port"]
+        self.mcp.run(transport=transport, port=port)
+
+
 if __name__ == "__main__":
-    logger.info("Starting magnet search MCP server")
-    run_config = MAGNET_SEARCH_MCP_SERVER_CONFIG
-    transport, port = run_config["transport"], run_config["port"]
-    mcp.run(transport=transport, port=port)
+    MagnetSearchMcpServer().run()

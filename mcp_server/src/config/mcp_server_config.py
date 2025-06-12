@@ -1,4 +1,4 @@
-from config.env_config import env_config
+from .env_config import env_config
 
 
 def get_config_with_env(port_key: str, transport_key: str, default_port: int, default_transport: str) -> dict:

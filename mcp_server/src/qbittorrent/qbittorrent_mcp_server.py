@@ -1,13 +1,13 @@
 import logging
 import mcp.types as types
 from pydantic import Field
-import os
 from dotenv import load_dotenv
 from typing import List
 from fastmcp import FastMCP
 from qbittorrentapi import Client
 from config.mcp_server_config import QBITTORRENT_MCP_SERVER_CONFIG
 from config.env_config import env_config
+
 
 # Configure logging
 logging.basicConfig(
@@ -16,11 +16,6 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 logger = logging.getLogger(__name__)
-
-# Load both .env files
-load_dotenv()  # Load root .env file
-load_dotenv(
-    os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), '.env'))  # Load autogen_version/.env file
 
 mcp = FastMCP("qbittorrent_mcp_server")
 
@@ -76,8 +71,17 @@ def add_download_url(
     return [types.TextContent(type="text", text=result)]
 
 
+class QbittorrentMCPServer:
+    def __init__(self):
+        load_dotenv()
+        self.mcp = mcp
+
+    def run(self):
+        logger.info("Starting qbittorrent operation MCP server")
+        run_config = QBITTORRENT_MCP_SERVER_CONFIG
+        transport, port = run_config["transport"], run_config["port"]
+        mcp.run(transport=transport, port=port)
+
+
 if __name__ == "__main__":
-    logger.info("Starting qbittorrent operation MCP server")
-    run_config = QBITTORRENT_MCP_SERVER_CONFIG
-    transport, port = run_config["transport"], run_config["port"]
-    mcp.run(transport=transport, port=port)
+    QbittorrentMCPServer().run()
