@@ -1,5 +1,5 @@
 import asyncio
-
+import json
 from autogen_ext.tools.mcp import SseMcpToolAdapter, SseServerParams, mcp_server_tools
 from autogen_version.deepseek_adapter import MyDeepSeekClient
 from autogen_version.prompts.qbittorrent_planning_agent_prompt import PLANNING_AGENT_PROMPT
@@ -12,8 +12,9 @@ from autogen_version.stop_condition.stop_condition import stop
 from autogen_version.stop_condition.stop_condition import FunctionCallTermination
 from autogen_agentchat.agents import AssistantAgent, UserProxyAgent
 from autogen_agentchat.conditions import MaxMessageTermination, TextMentionTermination
-from autogen_agentchat.teams import SelectorGroupChat
+from autogen_agentchat.teams import SelectorGroupChat, BaseGroupChat
 from autogen_agentchat.ui import Console
+from ui.WebUiResponseConsole import WebUiResponseConsole
 from autogen_version.config.env_config import env_config
 
 DEEPSEEK_API_KEY = env_config.get("DEEPSEEK_API_KEY")
@@ -25,7 +26,7 @@ class QbittorrentAgent:
     def __init__(self, task: str):
         self.task = task
 
-    async def run(self):
+    async def create_team(self) -> BaseGroupChat:
         model_client = MyDeepSeekClient(model="deepseek-chat", api_key=DEEPSEEK_API_KEY)
 
         planning_agent = AssistantAgent(
@@ -74,17 +75,41 @@ class QbittorrentAgent:
         max_messages_termination = MaxMessageTermination(max_messages=15)
         termination = function_call_termination | max_messages_termination
 
-        team = SelectorGroupChat(
+        return SelectorGroupChat(
             [planning_agent, qbittorrent_tool_agent, magnet_search_agent, stop_agent],
             model_client=model_client,
             termination_condition=termination,
             selector_prompt=SELECTOR_PROMPT,
             allow_repeated_speaker=True,  # Allow an agent to speak multiple turns in a row.
         )
-        console = Console(team.run_stream(task=self.task))
-        await console
+
+    async def run(self):
+        team = await self.create_team()
+        console = await Console(team.run_stream(task=self.task))
+        return console
+
+    async def web_run(self):
+        team = await self.create_team()
+        console = WebUiResponseConsole(team.run_stream(task=self.task))
+        return console
 
 
 if __name__ == "__main__":
     task = "下载电影: Before sunrise"
-    asyncio.run(QbittorrentAgent(task).run())
+
+
+    async def web_run_main():
+        agent = QbittorrentAgent(task)
+        console = await agent.web_run()
+        async for response in console:
+            print(json.dumps(response.to_dict(), ensure_ascii=False, indent=2))
+        print("finished!!!!!!!!!")
+
+
+    async def console_main():
+        agent = QbittorrentAgent(task)
+        await agent.run()
+
+
+    # asyncio.run(web_run_main())
+    asyncio.run(console_main())
