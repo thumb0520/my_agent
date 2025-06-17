@@ -119,7 +119,7 @@ python my_assistant_agent.py
 - [ ] 查询下载列表
 - [ ] 删除没有速度的种子
 
-### magnet_search_mcp_server
+### magnet_search_mcp_server 基于[rarbgcli](https://github.com/FarisHijazi/rarbgcli)改造
 
 - [x] 从 rarbg 搜索磁力链接 🧲
 - [x] 自动选择文件大小最大的种子
@@ -136,6 +136,7 @@ python my_assistant_agent.py
 主要依赖包括：
 
 ### AutoGen 版本依赖
+
 - autogen-agentchat==0.6.1
 - autogen-core==0.6.1
 - autogen-ext==0.6.1
@@ -145,6 +146,7 @@ python my_assistant_agent.py
 - mcp==1.9.3
 
 ### MCP 服务依赖
+
 - fastmcp==2.8.0
 - mcp==1.9.3
 - qbittorrent-api==2025.5.0
