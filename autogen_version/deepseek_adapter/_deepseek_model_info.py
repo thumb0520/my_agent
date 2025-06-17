@@ -25,10 +25,10 @@ _MODEL_INFO: Dict[str, ModelInfo] = {
     },
     "deepseek-reasoner": {
         "vision": False,
-        "function_calling": False,
-        "json_output": False,
+        "function_calling": True,
+        "json_output": True,
         "family": ModelFamily.R1,
-        "structured_output": False,
+        "structured_output": True,
         "multiple_system_messages": False,
     }
 }
