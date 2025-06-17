@@ -73,35 +73,31 @@ cp .env.example .env
 - DEEPSEEK_API_KEY：DeepSeek API 密钥
 - TAVILY_API_KEY：Tavily 搜索 API 密钥
 
-## 主要功能
-
-项目提供了两个版本的实现：
-
-1. AutoGen 版本 (`autogen_version/`)
-    - 基于 AutoGen 框架的智能代理实现
-    - 包含自定义工具和提示词模板
-    - 支持多种停止条件
-    - 已集成 MCP 服务
-
-2. AgentScope 版本 (`agentscope_version/`)
-    - 基于 AgentScope 框架的智能代理实现
-    - 包含自定义工具和提示词模板
-    - 支持运行记录和示例代码
-
 ## 使用说明
 
 ### 启动 MCP SSE Server
 
+1. 创建并激活虚拟环境：
+
 ```bash
-cd agentscope_version/mcp_tools
-mcp run main.py -t sse
+cd mcp_server
+# 创建新的 conda 环境
+conda create -n mcp_server python=3.12
+conda activate mcp_server
+pip install -r requirements.txt
+```
+
+2. 启动mcp servers
+
+```bash
+python main.py
 ```
 
 ### AutoGen 版本
 
 ```bash
 cd autogen_version
-python my_autogen_assistant_agent.py
+python main.py
 ```
 
 ### AgentScope 版本
