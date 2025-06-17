@@ -58,7 +58,7 @@ conda activate autogen
 3. 安装依赖：
 
 ```bash
-cd autogen_verssion
+cd autogen_version
 pip install -r requirements.txt
 ```
 
