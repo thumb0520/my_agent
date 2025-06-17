@@ -13,8 +13,13 @@ from autogen_agentchat.messages import (
     BaseChatMessage,
     ModelClientStreamingChunkEvent,
     MultiModalMessage,
-    ToolCallRequestEvent, TextMessage, ToolCallExecutionEvent,
+    ToolCallRequestEvent,
+    TextMessage,
+    ToolCallExecutionEvent,
+    ToolCallSummaryMessage,
 )
+from autogen_ext.agents.openai._openai_agent import ImageMessage
+
 from .WebResponse import WebResponse
 
 
@@ -146,6 +151,12 @@ async def WebUiResponseConsole(
                         "source": message.source,
                     }
                     yield WebResponse("text_message", output)
+                elif isinstance(message, ToolCallSummaryMessage):
+                    output = {
+                        "message": message.to_text(),
+                        "source": message.source,
+                    }
+                    yield WebResponse("tool_call_summary", output)
                 else:
                     print(f"Unhandled message type: {type(message)}")
                     print(f"Unhandled message: {message.to_text()}")
@@ -163,3 +174,11 @@ async def WebUiResponseConsole(
                         )
                     total_usage.completion_tokens += message.models_usage.completion_tokens
                     total_usage.prompt_tokens += message.models_usage.prompt_tokens
+
+
+def default_output(message: BaseAgentEvent | BaseChatMessage | TaskResult):
+    output = {
+        "message": message.to_text(),
+        "source": message.source,
+    }
+    return output
