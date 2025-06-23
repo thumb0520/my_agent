@@ -164,6 +164,8 @@ python my_assistant_agent.py
 - [x] autogen 适配 deepseek 结构化输出 api
 - [x] autogen version 接入 mcp server
 - [x] autogen version 增加网页流式返回输出
+- [ ] 添加字幕搜索mcp server
+- [ ] 添加刮削mcp server
 - [ ] autogen deepseek 结构化输出接口自动添加实体类型描述至 system prompt
 - [ ] autogen 写一个复杂图结构的 agent 应用
 - [ ] 添加页面交互，提交下载任务
